@@ -1,0 +1,31 @@
+{
+  "fitbit": {
+    "appUUID": "0de874e2-f6fa-49b9-b791-7f41823f6fc2",
+    "appType": "clockface",
+    "appDisplayName": "Charlie's Minimal Watchface",
+    "iconFile": "resources/icon.png",
+    "wipeColor": "",
+    "requestedPermissions": [
+      "access_heart_rate",
+      "access_activity"
+    ],
+    "buildTargets": [
+      "mira"
+    ],
+    "i18n": {
+      "en": {
+        "name": "Charlie's Minimal Watchface"
+      }
+    },
+    "defaultLanguage": "en-US"
+  },
+  "devDependencies": {
+    "@fitbit/sdk": "~4.0.0",
+    "@fitbit/sdk-cli": "^1.7.0",
+    "fitbit-sdk-types": "^4.3.0"
+  },
+  "scripts": {
+    "build": "fitbit-build"
+  },
+  "dependencies": {}
+}

@@ -1,0 +1,47 @@
+<svg class="background">
+  <svg id="left">
+    <svg class="battery">
+      <text id="battery" />
+
+      <image fill="lightgreen" href="assets/icons/stat_am_open_32px.png" />
+    </svg>
+
+    <svg class="bpm">
+      <text id="bpm" />
+
+      <image fill="hotpink" href="assets/icons/stat_hr_open_32px.png" />
+    </svg>
+
+    <svg class="steps">
+      <text id="steps" />
+
+      <image fill="lightskyblue" href="assets/icons/stat_steps_open_32px.png" />
+    </svg>
+
+    <svg class="floors">
+      <text id="floors" />
+
+      <image fill="yellow" href="assets/icons/stat_floors_open_32px.png" />
+    </svg>
+  </svg>
+
+  <svg id="right">
+    <svg class="time">
+      <text id="hour" />
+      <text id="minute" />
+      <text id="second" />
+    </svg>
+
+    <svg class="date">
+      <text id="day" />
+      <text id="month" />
+      <text id="year" />
+    </svg>
+  </svg>
+
+  <line x1="0" x2="100%" y1="80%" y2="80%" fill="white" stroke-width="1" />
+
+  <svg id="bottom">
+    <text id="info" />
+  </svg>
+</svg>

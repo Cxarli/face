@@ -1,0 +1,230 @@
+image {
+  width: 32;
+  height: 32;
+
+  y: 0;
+}
+
+#left image {
+  x: 100%-48;
+}
+
+#left {
+  width: 50%;
+  height: 85%;
+
+  x: 0;
+  y: 0;
+}
+
+#right {
+  width: 50%;
+  height: 85%;
+
+  x: 50%;
+  y: 0;
+}
+
+#bottom {
+  width: 100%;
+  height: 15%;
+
+  x: 0;
+  y: 90%;
+}
+
+
+.time {
+  height: 50%;
+  width: 100%;
+
+  x: 0;
+  y: 0;
+}
+
+.date {
+  height: 50%;
+  width: 100%;
+
+  x: 0;
+  y: 50%;
+}
+
+
+.time text {
+  font-family: "Seville-Bold-Condensed";
+  font-size: 60;
+}
+
+#hour {
+  text-length: 3;
+
+  fill: mediumseagreen;
+
+  x: 50%;
+  y: 50%;
+
+  text-anchor: end;
+}
+
+#minute {
+  text-length: 3;
+
+  fill: coral;
+
+  x: 100%;
+  y: 50%;
+
+  text-anchor: end;
+}
+
+#second {
+  text-length: 2;
+  font-size: 30;
+
+  fill: grey;
+
+  x: 100%;
+  y: 75%;
+
+  text-anchor: end;
+}
+
+.date text {
+  font-family: "Seville-Bold";
+  font-size: 50;
+}
+
+#day {
+  text-length: 2;
+
+  fill: mediumseagreen;
+
+  x: 0;
+  y: 50%;
+
+  text-anchor: start;
+}
+
+#month {
+  text-length: 3;
+
+  fill: coral;
+
+  x: 100%;
+  y: 50%;
+
+  text-anchor: end;
+}
+
+#year {
+  text-length: 4;
+  font-size: 20;
+
+  fill: grey;
+
+  x: 100%;
+  y: 75%;
+
+  text-anchor: end;
+}
+
+
+
+.left text {
+  font-family: "Seville-Condensed";
+  font-size: 30;
+}
+
+.battery {
+  height: 25%;
+  width: 100%;
+
+  x: 5;
+  y: 0;
+}
+
+.bpm {
+  height: 25%;
+  width: 100%;
+
+  x: 5;
+  y: 25%;
+}
+
+.steps {
+  height: 25%;
+  width: 100%;
+
+  x: 5;
+  y: 50%;
+}
+
+.floors {
+  height: 25%;
+  width: 100%;
+
+  x: 5;
+  y: 75%;
+}
+
+
+#battery {
+  text-length: 3;
+
+  x: 100%-64;
+  y: 30;
+
+  text-anchor: end;
+
+  fill: white;
+}
+
+#bpm {
+  text-length: 3;
+
+  x: 100%-64;
+  y: 30;
+
+  text-anchor: end;
+
+  fill: white;
+}
+
+#steps {
+  text-length: 6;
+
+  x: 100%-64;
+  y: 30;
+
+  text-anchor: end;
+
+  fill: white;
+}
+
+#floors {
+  text-length: 3;
+
+  x: 100%-64;
+  y: 30;
+
+  text-anchor: end;
+
+  fill: white;
+}
+
+
+
+#info {
+  font-size: 25;
+  text-length: 128;
+
+  fill: white;
+
+  height: 100%;
+  width: 100%;
+  x: 50%;
+  y: 0;
+
+  text-anchor: middle;
+}

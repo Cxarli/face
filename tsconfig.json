@@ -1,0 +1,8 @@
+{
+	"extends": "./node_modules/@fitbit/sdk/sdk-tsconfig.json",
+	"compilerOptions": {
+		"target": "ES2017",
+		"lib": ["ES2017"],
+		"strict": true
+	}
+}
