@@ -42,6 +42,9 @@
   <line x1="0" x2="100%" y1="80%" y2="80%" fill="white" stroke-width="1" />
 
   <svg id="bottom">
-    <text id="info" />
+    <svg id="info">
+      <text id="info_left" />
+      <text id="info_right" />
+    </svg>
   </svg>
 </svg>

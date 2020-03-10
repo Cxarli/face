@@ -15,7 +15,7 @@ function $(id: string): Element {
     const elem = document.getElementById(id);
 
     if (elem === null) {
-        throw new TypeError("Unknown ID");
+        throw new TypeError("Unknown ID `" + id + "`");
     }
 
     return elem;
@@ -44,12 +44,21 @@ if (HeartRateSensor) {
 // Allow having different states
 let state = 0;
 const nr_states = 2;
-const sec_p_state = 2;
+const sec_p_state = 3;
 
 // @TODO: i18n
 const months = [
     "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
 ];
+
+
+/**
+ * Round bytes to kilobytes with 1 digit precision
+ * @param bytes
+ */
+function b2kb(bytes: number): number {
+    return Math.round(bytes / 1024 * 10) / 10;
+}
 
 
 clock.ontick = ({ date }) => {
@@ -95,13 +104,13 @@ clock.ontick = ({ date }) => {
 
     // Set info
     try {
-        const $info = $('info');
-
         if (state === 0) {
-            $info.text = "Last sync: " + util.ago(me.lastSyncTime);
+            $('info_left').text = "Last sync";
+            $('info_right').text = util.ago(me.lastSyncTime);
         }
         else if (state === 1) {
-            $info.text = "JS memory: " + memory.js.used + "/" + memory.js.total;
+            $('info_left').text = "Memory";
+            $('info_right').text = b2kb(memory.js.used) + "/" + b2kb(memory.js.total) + " KB";
         }
 
     } catch (e) { err(e); }
