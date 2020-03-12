@@ -9,17 +9,53 @@ import * as util from "../common/utils";
 
 clock.granularity = "seconds";
 
-// Helper to get an element by ID
-// This throws when the ID is not found
-function $(id: string): Element {
-    const elem = document.getElementById(id);
 
-    if (elem === null) {
-        throw new TypeError("Unknown ID `" + id + "`");
+const $ = (() => {
+    /**
+     * Add a wrapper around the normal Element to cache all .text = calls
+     * to make sure that nothing happens if the value didn't change
+     */
+    class WrappedElement {
+        private _element: Element;
+        private _prev_text?: string;
+
+        constructor(element: Element) {
+            this._element = element;
+        }
+
+        get text(): string {
+            return this._element.text;
+        }
+
+        set text(value: string) {
+            // Don't change if nothing changed
+            if (this._prev_text === value) return;
+
+            this._prev_text = this._element.text = value;
+        }
     }
 
-    return elem;
-}
+    // Cache for $
+    const cache = {};
+
+    /**
+     * Helper to get an element by ID
+     * This throws when the ID is not found
+     */
+    return function(id: string): WrappedElement {
+        // Try cache
+        if (typeof cache[id] !== 'undefined') return cache[id];
+
+        // Retrieve
+        const elem = document.getElementById(id);
+        if (elem === null) {
+            throw new TypeError("Unknown ID `" + id + "`");
+        }
+
+        // Store in cache
+        return cache[id] = new WrappedElement(elem);
+    };
+})();
 
 // Shortcut function
 function err(e: Error): void {
@@ -42,13 +78,17 @@ if (HeartRateSensor) {
 
 
 // Allow having different states
-let state = 0;
+let state: number = 0;
 const nr_states = 2;
 const sec_p_state = 3;
 
-// @TODO: i18n
-const months = [
-    "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+// TODO: use user-chosen locale?
+const months: string[] = [
+    "Jan", "Feb", "Mar", "Apr", "Maj", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dec"
+];
+
+const days: string[] = [
+    "月", "火", "水", "木", "金", "土", "日"
 ];
 
 
@@ -84,12 +124,14 @@ clock.ontick = ({ date }) => {
 
     // Set date
     try {
+        const weekday = date.getDay();
         const day = date.getDate();
         const month = date.getMonth();
         const year = date.getFullYear();
 
+        $('weekday').text = days[weekday - 1];
         $('day').text = util.leftpad(day.toString(), 2, ' ');
-        $('month').text = months[month - 1];
+        $('month').text = months[month];
         $('year').text = year.toString();
 
     } catch (e) { err(e); }

@@ -56,6 +56,11 @@ image {
   font-size: 70;
 }
 
+.date text {
+  font-family: "Seville-Bold-Condensed";
+  font-size: 50;
+}
+
 #hour {
   text-length: 3;
 
@@ -90,11 +95,6 @@ image {
   text-anchor: end;
 }
 
-.date text {
-  font-family: "Seville-Bold";
-  font-size: 50;
-}
-
 #day {
   text-length: 2;
 
@@ -117,6 +117,19 @@ image {
   text-anchor: end;
 }
 
+#weekday {
+  text-length: 4;
+  font-size: 30;
+  font-family: 'Colfax-Medium';
+
+  fill: orchid;
+
+  x: 45%;
+  y: 75%;
+
+  text-anchor: end;
+}
+
 #year {
   text-length: 4;
   font-size: 20;
@@ -131,9 +144,9 @@ image {
 
 
 
-.left text {
-  font-family: "Seville-Condensed";
-  font-size: 30;
+#left text {
+  font-family: "Colfax-Light";
+  font-size: 36;
 }
 
 .battery {

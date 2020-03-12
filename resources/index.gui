@@ -35,6 +35,7 @@
     <svg class="date">
       <text id="day" />
       <text id="month" />
+      <text id="weekday" />
       <text id="year" />
     </svg>
   </svg>

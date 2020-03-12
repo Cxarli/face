@@ -52,7 +52,7 @@ export function ago(date: Date): string {
 	else if (diff_s >= 10) {
 		return plural(diff_s, 'sec') + ' ago';
 	}
-	else if (diff_s >= 0) {
+	else if (diff_s >= -1) { // for some rounding issues (-0.1), we take 1 second in the future as "now"
 		return "just now";
 	}
 	else {
