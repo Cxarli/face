@@ -88,7 +88,8 @@ const months: string[] = [
 ];
 
 const days: string[] = [
-    "月", "火", "水", "木", "金", "土", "日"
+    // Sun..Sat because ISO-8601 is too hard
+    "日", "月", "火", "水", "木", "金", "土"
 ];
 
 
@@ -129,7 +130,7 @@ clock.ontick = ({ date }) => {
         const month = date.getMonth();
         const year = date.getFullYear();
 
-        $('weekday').text = days[weekday - 1];
+        $('weekday').text = days[weekday];
         $('day').text = util.leftpad(day.toString(), 2, ' ');
         $('month').text = months[month];
         $('year').text = year.toString();
