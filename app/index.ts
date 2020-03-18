@@ -5,15 +5,19 @@ import { memory } from "system";
 import { HeartRateSensor } from "heart-rate";
 import { today } from "user-activity";
 import { battery } from "power";
+import { BodyPresenceSensor } from "body-presence";
+import { display } from "display";
+
 import * as util from "../common/utils";
+import { run, runv, wraperr } from "../common/utils";
+import * as fs from "fs";
 
 clock.granularity = "seconds";
 
-
 const $ = (() => {
     /**
-     * Add a wrapper around the normal Element to cache all .text = calls
-     * to make sure that nothing happens if the value didn't change
+     * Add a wrapper around the normal Element to cache all .text calls
+     * to make sure that nothing on the DOM happens if the value didn't change
      */
     class WrappedElement {
         private _element: Element;
@@ -24,7 +28,9 @@ const $ = (() => {
         }
 
         get text(): string {
-            return this._element.text;
+            if (typeof this._prev_text !== 'undefined') return this._prev_text;
+
+            return this._prev_text = this._element.text;
         }
 
         set text(value: string) {
@@ -36,7 +42,7 @@ const $ = (() => {
     }
 
     // Cache for $
-    const cache = {};
+    const cache: Record<string, WrappedElement> = {};
 
     /**
      * Helper to get an element by ID
@@ -57,29 +63,49 @@ const $ = (() => {
     };
 })();
 
-// Shortcut function
-function err(e: Error): void {
-    console.error(e);
-}
+
+// --- Heart rate --- \\
 
 // Read heart rate
-let bpm: number = 0;
-if (HeartRateSensor) {
-    const hrm = new HeartRateSensor();
+let bpm = 0;
 
-    hrm.addEventListener("reading", () => {
-        if (hrm.heartRate !== null) {
-            bpm = hrm.heartRate;
-        }
-    });
+try {
+    if (!HeartRateSensor) throw new Error("No heart rate sensor detected");
 
-    hrm.start();
-}
+    const hrs: HeartRateSensor = new HeartRateSensor();
+
+    enum reason {
+        nobody = 1,
+        nodisplay = 2,
+    }
+
+    // Allow pausing for several reasons
+    let hrspauser: util.Pauser<reason> = new util.Pauser(
+        () => { hrs?.start(); },
+        () => { hrs?.stop(); bpm = 0; },
+    );
+
+    // Listen for heart rate
+    hrs.addEventListener('reading', () => { bpm = hrs?.heartRate || 0; });
+    hrs.start();
+
+    // Pause when not on body
+    if (BodyPresenceSensor) {
+        const bps = new BodyPresenceSensor();
+        bps.addEventListener('reading', () => { hrspauser.apply(reason.nobody, !bps.present); });
+        bps.start();
+    }
+
+    // Pause when not displayed
+    display.addEventListener('change', () => { hrspauser.apply(reason.nodisplay, !display.on); });
+
+} catch (e) { console.error(e); }
 
 
-// Allow having different states
+
+// Allow having different states for the info box
 let state: number = 0;
-const nr_states = 2;
+const nr_states = 3;
 const sec_p_state = 3;
 
 // TODO: use user-chosen locale?
@@ -89,72 +115,151 @@ const months: string[] = [
 
 const days: string[] = [
     // Sun..Sat because ISO-8601 is too hard
-    "日", "月", "火", "水", "木", "金", "土"
+    "日・にち", "月・げつ", "火・か", "水・すい", "木・もく", "金・きん", "土・ど"
 ];
 
 
-/**
- * Round bytes to kilobytes with 1 digit precision
- * @param bytes
- */
-function b2kb(bytes: number): number {
-    return Math.round(bytes / 1024 * 10) / 10;
-}
+// list of all measures battery stats in the last TTL milliseconds
+// first item is time in milliseconds, second item is battery percentage
+const batteries: Array<[number, number]> = run([], () => {
+    interface bat {
+        data: Array<[number, number]>,
+        version: string,
+    }
+
+    const batteries: bat = {
+        data: [],
+        version: "1.0.0",
+    };
+
+    // Constants
+    const file = "battery.json";
+    const ttl = 10 * 60 * 1000; // 10 minutes in milliseconds
+    const writedelay = Number.MAX_SAFE_INTEGER; // don't
+
+    // Try reading from cache
+    runv((): void => {
+        // Read file. This can throw but that's fine
+        const input: bat = fs.readFileSync(file, "json");
+
+        // Compare version string
+        if (input.version !== batteries.version) {
+            throw new Error(`Battery file version ${input.version} doesn't match own version ${batteries.version}`);
+        }
+
+        // Prepend data
+        batteries.data = input.data.concat(batteries.data);
+    });
+
+    // Write current stats to file
+    const write = wraperr(() => {
+
+        console.log("write");
+
+        // write to file
+        fs.writeFileSync(file, batteries, "json");
+    });
+
+    // Keep track when the last write was to avoid writing too often
+    let lastwrite = +new Date;
+
+    // Listen to changes
+    battery.onchange = wraperr((_event) => {
+
+        // Get current stats
+        const time = +new Date;
+        const level = battery.chargeLevel;
+        console.log(time + ": " + level + "%");
+
+        // add current level
+        batteries.data.push([ time, level ]);
+
+        // remove all levels that expired
+        while (batteries.data.length > 0 && batteries.data[0][0] < time - ttl) batteries.data.shift();
+
+        // write if delay has passed
+        if (time >= lastwrite + writedelay) {
+            write();
+            lastwrite = time;
+        }
+    });
+
+    // Trigger first event
+    battery.onchange(<Event> <any> null);
+
+    // Expose data to add
+    return batteries.data;
+});
 
 
-clock.ontick = ({ date }) => {
+clock.ontick = wraperr(({ date }) => {
 
-    // I have wrapped several blocks in a try-catch statement to make sure
+    // I have wrapped several blocks in a `runv` statement to make sure
     // that everything else can still render if something goes wrong
 
     // Set time
-    try {
-        const hours = date.getHours();
-        const mins = date.getMinutes();
+    runv((): void => {
         const secs = date.getSeconds();
 
-        $('hour').text = hours.toString();
-        $('minute').text = util.leftpad(mins.toString(), 2, '0');
+        $('hour').text = date.getHours().toString();
+        $('minute').text = util.leftpad(date.getMinutes().toString(), 2, '0');
         $('second').text = util.leftpad(secs.toString(), 2, '0');
 
-        //                 (secs % (3         * 2          )) / 2
-        //                 ([0..5]) / 2 -> [0;1, 2;3, 4;5]
         state = Math.floor((secs % (nr_states * sec_p_state)) / sec_p_state);
-
-    } catch (e) { err(e); }
+    });
 
     // Set date
-    try {
-        const weekday = date.getDay();
-        const day = date.getDate();
-        const month = date.getMonth();
-        const year = date.getFullYear();
+    runv((): void => {
+        $('weekday').text = days[date.getDay()];
+        $('day').text = util.leftpad(date.getDate().toString(), 2, ' ');
+        $('month').text = months[date.getMonth()];
+        $('year').text = "'" + (date.getFullYear() % 100).toString(); // Y2K bug
+    });
 
-        $('weekday').text = days[weekday];
-        $('day').text = util.leftpad(day.toString(), 2, ' ');
-        $('month').text = months[month];
-        $('year').text = year.toString();
+    // Set battery
+    runv((): void => {
+        $('battery').text = Math.round(battery.chargeLevel).toString();
+        // @TODO: Set color of text to red when very low (<20)
+    });
 
-    } catch (e) { err(e); }
-
-    // Set battery, bpm, steps and floors
-    try {
-        $('battery').text = Math.floor(battery.chargeLevel).toString();
+    // Set bpm, steps and floors
+    runv((): void => {
         $('bpm').text = bpm ? bpm.toString() : '--';
         $('steps').text = today.adjusted.steps?.toString() || '--';
         $('floors').text = today.adjusted.elevationGain?.toString() || '--';
-    } catch (e) { err(e); }
+    });
 
     // Set info
-    try {
+    runv((): void => {
         if (state === 0) {
             $('info_left').text = "Last sync";
             $('info_right').text = util.ago(me.lastSyncTime);
         }
         else if (state === 1) {
             $('info_left').text = "Memory";
-            $('info_right').text = b2kb(memory.js.used) + "/" + b2kb(memory.js.total) + " KB";
+            $('info_right').text = util.b2kb(memory.js.used) + "/" + util.b2kb(memory.js.total) + " KB";
         }
+        else if (state === 2) {
+            $('info_left').text = "%/h";
 
-    } catch (e) { err(e); }
-}
+            if (batteries.length <= 1) {
+                // Not enough measurements to calculate
+                $('info_right').text = '--';
+            } else {
+                // Calculate the difference with the average of all measurements in the last 10 minutes
+                // then multiply this difference with 2 to make it span the whole duration
+                const avg = batteries.reduce((acc, bat) => acc + bat[1], 0) / batteries.length;
+                const diff = (batteries[batteries.length - 1][1] - avg) * 2;
+
+                // Get the duration of the timespan
+                const timediff = batteries[batteries.length - 1][0] - batteries[0][0];
+
+                // Extrapolate the change in battery per hour
+                const batphour = Math.round(diff / (timediff / 3600000));
+
+                // Prefix positive numbers with '+' to make it look neater
+                $('info_right').text = (diff > 0 ? "+" : "") + batphour + "%";
+            }
+        }
+    });
+});

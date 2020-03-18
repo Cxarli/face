@@ -118,20 +118,20 @@ image {
 }
 
 #weekday {
-  text-length: 4;
+  text-length: 20;
   font-size: 30;
   font-family: 'Colfax-Medium';
 
   fill: orchid;
 
-  x: 45%;
+  x: 0;
   y: 75%;
 
-  text-anchor: end;
+  text-anchor: start;
 }
 
 #year {
-  text-length: 4;
+  text-length: 3;
   font-size: 20;
 
   fill: grey;
