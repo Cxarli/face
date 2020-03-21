@@ -14,6 +14,10 @@ import * as fs from "fs";
 
 clock.granularity = "seconds";
 
+// milliseconds
+type ms = number;
+
+
 const $ = (() => {
     /**
      * Add a wrapper around the normal Element to cache all .text calls
@@ -134,8 +138,8 @@ const batteries: Array<[number, number]> = run([], () => {
 
     // Constants
     const file = "battery.json";
-    const ttl = 10 * 60 * 1000; // 10 minutes in milliseconds
-    const writedelay = Number.MAX_SAFE_INTEGER; // don't
+    const ttl: ms = 12 * 60 * 60 * 1000;
+    const writedelay: ms = 1000;
 
     // Try reading from cache
     runv((): void => {

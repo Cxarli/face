@@ -204,8 +204,9 @@ image {
   fill: white;
 }
 
-#steps {
+text#steps {
   text-length: 6;
+  font-size: 30;
 
   x: 100%-64;
   y: 30;
