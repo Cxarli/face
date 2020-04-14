@@ -1,4 +1,3 @@
-
 /**
  * Get the singular or plural word depending on the number
  *
@@ -79,7 +78,7 @@ export function wraperr<A extends any[], R>(fn: Fn<A, R>, def?: R): Fn<A, R|unde
             return fn(...args);
         }
         catch (e) {
-            console.error(e);
+			console.error(e);
             return def;
         }
     };

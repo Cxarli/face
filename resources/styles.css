@@ -189,7 +189,6 @@ image {
   y: 30;
 
   text-anchor: end;
-
   fill: white;
 }
 
@@ -204,9 +203,8 @@ image {
   fill: white;
 }
 
-text#steps {
+#steps {
   text-length: 6;
-  font-size: 30;
 
   x: 100%-64;
   y: 30;

@@ -1,7 +1,7 @@
 <svg class="background">
   <svg id="left">
     <svg class="battery">
-      <text id="battery" />
+      <text id="battery" class="fillwhite" />
 
       <image fill="lightgreen" href="assets/icons/stat_am_open_32px.png" />
     </svg>

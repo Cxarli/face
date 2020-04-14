@@ -31,6 +31,10 @@ const $ = (() => {
             this._element = element;
         }
 
+        get element(): Element {
+            return this._element;
+        }
+
         get text(): string {
             if (typeof this._prev_text !== 'undefined') return this._prev_text;
 
@@ -67,6 +71,52 @@ const $ = (() => {
     };
 })();
 
+
+/**
+ * Access the style of the element with the given ID
+ * @param id
+ */
+const $style = (() => {
+    class WrappedStyle {
+        private _style: Style;
+
+        constructor(style: Style) {
+            this._style = style;
+        }
+
+
+        private _fontSize?: number;
+        get fontSize(): number|undefined {
+            if (typeof this._fontSize !== 'undefined') return this._fontSize;
+            return this._fontSize = this._style.fontSize;
+        }
+
+        set fontSize(fontSize: number|undefined) {
+            if (this._fontSize === fontSize) return;
+            this._fontSize = this._style.fontSize = fontSize;
+        }
+
+
+        private _fill?: string;
+        get fill(): string {
+            if (typeof this._fill !== 'undefined') return this._fill;
+            return this._fill = this._style.fill;
+        }
+
+        set fill(fill: string) {
+            if (this._fill === fill) return;
+            this._fill = this._style.fill = fill;
+        }
+    }
+
+    return function(id: string): WrappedStyle {
+        const el = $(id).element;
+
+        if (typeof (<any>el).style === 'undefined') throw new TypeError("Not a graphicselement");
+
+        return new WrappedStyle((el as GraphicsElement).style);
+    };
+})();
 
 // --- Heart rate --- \\
 
@@ -109,8 +159,8 @@ try {
 
 // Allow having different states for the info box
 let state: number = 0;
-const nr_states = 3;
-const sec_p_state = 3;
+const nr_states = 2;
+const sec_p_state = 2;
 
 // TODO: use user-chosen locale?
 const months: string[] = [
@@ -121,79 +171,6 @@ const days: string[] = [
     // Sun..Sat because ISO-8601 is too hard
     "日・にち", "月・げつ", "火・か", "水・すい", "木・もく", "金・きん", "土・ど"
 ];
-
-
-// list of all measures battery stats in the last TTL milliseconds
-// first item is time in milliseconds, second item is battery percentage
-const batteries: Array<[number, number]> = run([], () => {
-    interface bat {
-        data: Array<[number, number]>,
-        version: string,
-    }
-
-    const batteries: bat = {
-        data: [],
-        version: "1.0.0",
-    };
-
-    // Constants
-    const file = "battery.json";
-    const ttl: ms = 12 * 60 * 60 * 1000;
-    const writedelay: ms = 1000;
-
-    // Try reading from cache
-    runv((): void => {
-        // Read file. This can throw but that's fine
-        const input: bat = fs.readFileSync(file, "json");
-
-        // Compare version string
-        if (input.version !== batteries.version) {
-            throw new Error(`Battery file version ${input.version} doesn't match own version ${batteries.version}`);
-        }
-
-        // Prepend data
-        batteries.data = input.data.concat(batteries.data);
-    });
-
-    // Write current stats to file
-    const write = wraperr(() => {
-
-        console.log("write");
-
-        // write to file
-        fs.writeFileSync(file, batteries, "json");
-    });
-
-    // Keep track when the last write was to avoid writing too often
-    let lastwrite = +new Date;
-
-    // Listen to changes
-    battery.onchange = wraperr((_event) => {
-
-        // Get current stats
-        const time = +new Date;
-        const level = battery.chargeLevel;
-        console.log(time + ": " + level + "%");
-
-        // add current level
-        batteries.data.push([ time, level ]);
-
-        // remove all levels that expired
-        while (batteries.data.length > 0 && batteries.data[0][0] < time - ttl) batteries.data.shift();
-
-        // write if delay has passed
-        if (time >= lastwrite + writedelay) {
-            write();
-            lastwrite = time;
-        }
-    });
-
-    // Trigger first event
-    battery.onchange(<Event> <any> null);
-
-    // Expose data to add
-    return batteries.data;
-});
 
 
 clock.ontick = wraperr(({ date }) => {
@@ -222,15 +199,22 @@ clock.ontick = wraperr(({ date }) => {
 
     // Set battery
     runv((): void => {
-        $('battery').text = Math.round(battery.chargeLevel).toString();
-        // @TODO: Set color of text to red when very low (<20)
+        const charge = Math.round(battery.chargeLevel);
+
+        $('battery').text = charge.toString();
+
+        $style('battery').fill = charge <= 30 ? 'red' : 'white';
     });
 
     // Set bpm, steps and floors
     runv((): void => {
+        const steps = today.adjusted.steps;
+
         $('bpm').text = bpm ? bpm.toString() : '--';
-        $('steps').text = today.adjusted.steps?.toString() || '--';
+        $('steps').text = steps?.toString() || '--';
         $('floors').text = today.adjusted.elevationGain?.toString() || '--';
+
+        $style('steps').fontSize = steps && steps >= 10000 ? 30 : 36;
     });
 
     // Set info
@@ -242,28 +226,6 @@ clock.ontick = wraperr(({ date }) => {
         else if (state === 1) {
             $('info_left').text = "Memory";
             $('info_right').text = util.b2kb(memory.js.used) + "/" + util.b2kb(memory.js.total) + " KB";
-        }
-        else if (state === 2) {
-            $('info_left').text = "%/h";
-
-            if (batteries.length <= 1) {
-                // Not enough measurements to calculate
-                $('info_right').text = '--';
-            } else {
-                // Calculate the difference with the average of all measurements in the last 10 minutes
-                // then multiply this difference with 2 to make it span the whole duration
-                const avg = batteries.reduce((acc, bat) => acc + bat[1], 0) / batteries.length;
-                const diff = (batteries[batteries.length - 1][1] - avg) * 2;
-
-                // Get the duration of the timespan
-                const timediff = batteries[batteries.length - 1][0] - batteries[0][0];
-
-                // Extrapolate the change in battery per hour
-                const batphour = Math.round(diff / (timediff / 3600000));
-
-                // Prefix positive numbers with '+' to make it look neater
-                $('info_right').text = (diff > 0 ? "+" : "") + batphour + "%";
-            }
         }
     });
 });
