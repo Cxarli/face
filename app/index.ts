@@ -9,8 +9,7 @@ import { BodyPresenceSensor } from "body-presence";
 import { display } from "display";
 
 import * as util from "../common/utils";
-import { run, runv, wraperr } from "../common/utils";
-import * as fs from "fs";
+import { runv, wraperr } from "../common/utils";
 
 clock.granularity = "seconds";
 
@@ -203,7 +202,7 @@ clock.ontick = wraperr(({ date }) => {
 
         $('battery').text = charge.toString();
 
-        $style('battery').fill = charge <= 30 ? 'red' : 'white';
+        $style('battery').fill = charge <= 25 ? 'red' : 'white';
     });
 
     // Set bpm, steps and floors
