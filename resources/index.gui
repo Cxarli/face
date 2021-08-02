@@ -3,25 +3,25 @@
     <svg class="battery">
       <text id="battery" class="fillwhite" />
 
-      <image fill="lightgreen" href="assets/icons/stat_am_open_32px.png" />
+      <image fill="fb-green" href="assets/icons/stat_am_open_32px.png" />
     </svg>
 
     <svg class="bpm">
       <text id="bpm" />
 
-      <image fill="hotpink" href="assets/icons/stat_hr_open_32px.png" />
+      <image fill="fb-magenta" href="assets/icons/stat_hr_open_32px.png" />
     </svg>
 
     <svg class="steps">
       <text id="steps" />
 
-      <image fill="lightskyblue" href="assets/icons/stat_steps_open_32px.png" />
+      <image fill="fb-blue" href="assets/icons/stat_steps_open_32px.png" />
     </svg>
 
     <svg class="floors">
       <text id="floors" />
 
-      <image fill="yellow" href="assets/icons/stat_floors_open_32px.png" />
+      <image fill="fb-yellow" href="assets/icons/stat_floors_open_32px.png" />
     </svg>
   </svg>
 
@@ -35,6 +35,7 @@
     <svg class="date">
       <text id="day" />
       <text id="month" />
+      <text id="furigana" />
       <text id="weekday" />
       <text id="year" />
     </svg>

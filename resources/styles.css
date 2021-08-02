@@ -61,10 +61,21 @@ image {
   font-size: 50;
 }
 
+#hour { fill: fb-green; }
+#day { fill: fb-green; }
+#minute { fill: fb-orange; }
+#month { fill: fb-orange; }
+#second { fill: fb-light-gray; }
+#year { fill: fb-light-gray; }
+#furigana { fill: fb-green; }
+#weekday { fill: fb-orange; }
+#battery { fill: fb-white; }
+#bpm { fill: fb-white; }
+#steps { fill: fb-white; }
+#floors { fill: fb-white; }
+
 #hour {
   text-length: 3;
-
-  fill: mediumseagreen;
 
   x: 45%;
   y: 50%;
@@ -74,8 +85,6 @@ image {
 
 #minute {
   text-length: 3;
-
-  fill: coral;
 
   x: 100%;
   y: 50%;
@@ -87,8 +96,6 @@ image {
   text-length: 2;
   font-size: 25;
 
-  fill: grey;
-
   x: 100%;
   y: 75%;
 
@@ -98,10 +105,9 @@ image {
 #day {
   text-length: 2;
 
-  fill: mediumseagreen;
-
   x: 45%;
-  y: 50%;
+  /* y: 50%; */
+  y: 25%;
 
   text-anchor: end;
 }
@@ -109,20 +115,41 @@ image {
 #month {
   text-length: 3;
 
-  fill: coral;
+  x: 100%;
+  /* y: 50%; */
+  y: 25%;
+
+  text-anchor: end;
+}
+
+#year {
+  /* text-length: 3; */
+  text-length: 6;
+
+  font-size: 20;
 
   x: 100%;
+  /* y: 75%; */
   y: 50%;
 
   text-anchor: end;
 }
 
-#weekday {
-  text-length: 20;
-  font-size: 30;
-  font-family: 'Colfax-Medium';
+#furigana {
+  text-length: 8;
+  /* font-size: 15; */
+  font-size: 20;
+  font-family: 'Colfax-Bold';
 
-  fill: orchid;
+  x: 0;
+  y: 50%;
+  text-anchor: start;
+}
+
+#weekday {
+  text-length: 10;
+  font-size: 30;
+  font-family: 'Colfax-Regular';
 
   x: 0;
   y: 75%;
@@ -130,22 +157,10 @@ image {
   text-anchor: start;
 }
 
-#year {
-  text-length: 3;
-  font-size: 20;
-
-  fill: grey;
-
-  x: 100%;
-  y: 75%;
-
-  text-anchor: end;
-}
-
 
 
 #left text {
-  font-family: "Colfax-Light";
+  font-family: "Colfax-Regular";
   font-size: 36;
 }
 
@@ -189,7 +204,6 @@ image {
   y: 30;
 
   text-anchor: end;
-  fill: white;
 }
 
 #bpm {
@@ -199,8 +213,6 @@ image {
   y: 30;
 
   text-anchor: end;
-
-  fill: white;
 }
 
 #steps {
@@ -210,8 +222,6 @@ image {
   y: 30;
 
   text-anchor: end;
-
-  fill: white;
 }
 
 #floors {
@@ -221,8 +231,6 @@ image {
   y: 30;
 
   text-anchor: end;
-
-  fill: white;
 }
 
 

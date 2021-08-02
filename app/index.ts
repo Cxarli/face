@@ -163,12 +163,27 @@ const sec_p_state = 2;
 
 // TODO: use user-chosen locale?
 const months: string[] = [
+    // January, February, March, April, May, June, July, August,   September, October, November, December
+    // Januari, Februari, Maart, April, Mei, June, Juli, Augustus, September, Oktober, November, December
+    // January, Februari, Mars,  April, Maj, Juni, Juli, Augusti,  September, Oktober, November, December
+
     "Jan", "Feb", "Mar", "Apr", "Maj", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dec"
 ];
 
-const days: string[] = [
+const days: [string, string][] = [
     // Sun..Sat because ISO-8601 is too hard
-    "日・にち", "月・げつ", "火・か", "水・すい", "木・もく", "金・きん", "土・ど"
+
+    // sun, mon,  tues, wednes, thurs,  fri,  satur
+    // zon, maan, dins, woens,  donder, vrij, zater
+    // sön, mån,  tis,  ons,    tors,   fre,  lör
+
+    ["日・so", "にち"],
+    ["月・ma", "げつ"],
+    ["火・ti", "か"],
+    ["水・wo", "すい"],
+    ["木・to", "もく"],
+    ["金・fr", "きん"],
+    ["土・za", "ど"],
 ];
 
 
@@ -190,10 +205,15 @@ clock.ontick = wraperr(({ date }) => {
 
     // Set date
     runv((): void => {
-        $('weekday').text = days[date.getDay()];
+        const day = days[date.getDay()];
+        $('furigana').text = day[1];
+        $('weekday').text = day[0];
         $('day').text = util.leftpad(date.getDate().toString(), 2, ' ');
         $('month').text = months[date.getMonth()];
-        $('year').text = "'" + (date.getFullYear() % 100).toString(); // Y2K bug
+
+        // Look, I was in a hurry and just wanted the decimal month there
+        $('year').text = (date.getMonth() + 1).toString();
+        $('year').text += " '" + (date.getFullYear() % 100).toString(); // Y2K bug
     });
 
     // Set battery
