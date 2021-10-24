@@ -61,13 +61,18 @@ image {
   font-size: 50;
 }
 
-#hour { fill: fb-green; }
-#day { fill: fb-green; }
+/* Due to a defect screen, green is invisible, somehow */
+/* #hour { fill: fb-green; } */
+/* #day { fill: fb-green; } */
+#hour { fill: fb-purple; }
+#day { fill: fb-purple; }
+
 #minute { fill: fb-orange; }
 #month { fill: fb-orange; }
 #second { fill: fb-light-gray; }
 #year { fill: fb-light-gray; }
-#furigana { fill: fb-green; }
+/* #furigana { fill: fb-green; } */
+#furigana { fill: fb-purple; }
 #weekday { fill: fb-orange; }
 #battery { fill: fb-white; }
 #bpm { fill: fb-white; }
