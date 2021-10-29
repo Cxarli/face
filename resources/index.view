@@ -1,4 +1,4 @@
-<svg class="background">
+<svg class="background" id="bg">
   <svg id="left">
     <svg class="battery">
       <text id="battery" class="fillwhite" />
@@ -10,6 +10,12 @@
       <text id="bpm" />
 
       <image fill="fb-magenta" href="assets/icons/stat_hr_open_32px.png" />
+    </svg>
+
+    <svg class="hpa">
+      <text id="hpa" />
+
+      <image fill="fb-aqua" href="assets/icons/stat_elevation_32px_p.png" />
     </svg>
 
     <svg class="steps">
@@ -35,9 +41,9 @@
     <svg class="date">
       <text id="day" />
       <text id="month" />
-      <text id="furigana" />
       <text id="weekday" />
-      <text id="year" />
+      <text id="datesubtop" />
+      <text id="datesubbot" />
     </svg>
   </svg>
 

@@ -1,3 +1,15 @@
+/** Positioning **/
+
+#bg {
+  /* Squircles are the worst to design for, so pretend we're a square */
+
+  width: 96%;
+  height: 96%;
+
+  x: 2%;
+  y: 2%;
+}
+
 image {
   width: 32;
   height: 32;
@@ -6,22 +18,23 @@ image {
 }
 
 #left image {
+  /* 48 = 32 + 32/2 */
   x: 100%-48;
 }
 
 #left {
-  width: 49%;
-  height: 85%;
+  width: 48%;
+  height: 85%; /* 100% - 15% */
 
-  x: 0;
+  x: 2%;
   y: 0;
 }
 
 #right {
-  width: 49%;
-  height: 85%;
+  width: 48%;
+  height: 85%; /* 100% - 15% */
 
-  x: 51%;
+  x: 52%;
   y: 0;
 }
 
@@ -30,13 +43,13 @@ image {
   height: 15%;
 
   x: 0;
-  y: 90%;
+  y: 90%; /* 100% - 15% + (line = 5%) */
 }
 
 
 .time {
   height: 50%;
-  width: 100%;
+  width: 95%;
 
   x: 0;
   y: 0;
@@ -44,130 +57,82 @@ image {
 
 .date {
   height: 50%;
-  width: 100%;
+  width: 95%;
 
   x: 0;
   y: 50%;
 }
 
 
-.time text {
-  font-family: "Seville-Bold-Condensed";
-  font-size: 70;
-}
-
-.date text {
-  font-family: "Seville-Bold-Condensed";
-  font-size: 50;
-}
-
-/* Due to a defect screen, green is invisible, somehow */
-/* #hour { fill: fb-green; } */
-/* #day { fill: fb-green; } */
-#hour { fill: fb-purple; }
-#day { fill: fb-purple; }
-
-#minute { fill: fb-orange; }
-#month { fill: fb-orange; }
-#second { fill: fb-light-gray; }
-#year { fill: fb-light-gray; }
-/* #furigana { fill: fb-green; } */
-#furigana { fill: fb-purple; }
-#weekday { fill: fb-orange; }
-#battery { fill: fb-white; }
-#bpm { fill: fb-white; }
-#steps { fill: fb-white; }
-#floors { fill: fb-white; }
-
 #hour {
-  text-length: 3;
-
-  x: 45%;
+  x: 50%;
   y: 50%;
 
+  text-length: 3;
   text-anchor: end;
 }
 
 #minute {
-  text-length: 3;
-
   x: 100%;
   y: 50%;
 
+  text-length: 3;
   text-anchor: end;
 }
 
 #second {
-  text-length: 2;
-  font-size: 25;
-
   x: 100%;
   y: 75%;
 
+  text-length: 2;
   text-anchor: end;
 }
 
 #day {
-  text-length: 2;
-
-  x: 45%;
-  /* y: 50%; */
+  x: 50%;
   y: 25%;
 
+  /* DD */
+  text-length: 2;
   text-anchor: end;
 }
 
 #month {
-  text-length: 3;
-
   x: 100%;
-  /* y: 50%; */
   y: 25%;
 
+  /* MMM */
+  text-length: 3;
   text-anchor: end;
 }
 
-#year {
-  /* text-length: 3; */
-  text-length: 6;
-
-  font-size: 20;
-
-  x: 100%;
-  /* y: 75%; */
-  y: 50%;
-
-  text-anchor: end;
-}
-
-#furigana {
-  text-length: 8;
-  /* font-size: 15; */
-  font-size: 20;
-  font-family: 'Colfax-Bold';
-
-  x: 0;
-  y: 50%;
-  text-anchor: start;
-}
-
+#datesub { fill: fb-light-gray; }
 #weekday {
-  text-length: 10;
-  font-size: 30;
-  font-family: 'Colfax-Regular';
-
-  x: 0;
+  x: 50%;
   y: 75%;
 
-  text-anchor: start;
+  /* K** */
+  text-length: 3;
+  text-anchor: end;
 }
 
+#datesubtop {
+  x: 100%;
+  y: 50%;
 
-
-#left text {
-  font-family: "Colfax-Regular";
-  font-size: 36;
+  /* MM 'YY */
+  text-length: 6;
+  text-anchor: end;
 }
+#datesubbot {
+  x: 100%;
+  y: 75%;
+
+  /* F**U** WD */
+  text-length: 9;
+  text-anchor: end;
+}
+
 
 .battery {
   height: 25%;
@@ -182,7 +147,15 @@ image {
   width: 100%;
 
   x: 5;
-  y: 25%;
+  y: 20%;
+}
+
+.hpa {
+  height: 25%;
+  width: 100%;
+
+  x: 5;
+  y: 40%;
 }
 
 .steps {
@@ -190,7 +163,7 @@ image {
   width: 100%;
 
   x: 5;
-  y: 50%;
+  y: 60%;
 }
 
 .floors {
@@ -198,43 +171,47 @@ image {
   width: 100%;
 
   x: 5;
-  y: 75%;
+  y: 80%;
 }
 
 
 #battery {
-  text-length: 3;
-
   x: 100%-64;
   y: 30;
 
+  text-length: 3;
   text-anchor: end;
 }
 
 #bpm {
-  text-length: 3;
-
   x: 100%-64;
   y: 30;
 
+  text-length: 3;
+  text-anchor: end;
+}
+
+#hpa {
+  x: 100%-64;
+  y: 30;
+
+  text-length: 10;
   text-anchor: end;
 }
 
 #steps {
-  text-length: 6;
-
   x: 100%-64;
   y: 30;
 
+  text-length: 6;
   text-anchor: end;
 }
 
 #floors {
-  text-length: 3;
-
   x: 100%-64;
   y: 30;
 
+  text-length: 3;
   text-anchor: end;
 }
 
@@ -256,9 +233,6 @@ image {
   y: 0;
 
   text-length: 25;
-
-  fill: grey;
-
   text-anchor: middle;
 }
 
@@ -269,8 +243,64 @@ image {
   y: 0;
 
   text-length: 25;
-
-  fill: white;
-
   text-anchor: middle;
 }
+
+
+/** Fonts **/
+
+#weekday {
+  font-size: 50;
+  font-family: 'Colfax-Regular';
+}
+
+#left text {
+  font-family: "Colfax-Regular";
+  font-size: 36;
+}
+
+.time text {
+  font-family: "Seville-Bold-Condensed";
+  font-size: 65;
+}
+
+.date text {
+  font-family: "Seville-Bold-Condensed";
+  font-size: 45;
+}
+
+#second {
+  font-size: 25;
+}
+
+#datesubtop {
+  font-size: 20;
+}
+#datesubbot {
+  font-size: 20;
+}
+
+
+/** Colors **/
+
+#info_left { fill: fb-light-gray; }
+#info_right { fill: fb-white; }
+
+#hour { fill: fb-slate; }
+#minute { fill: fb-purple; }
+#second { fill: fb-light-gray; }
+
+#day { fill: fb-slate; }
+#month { fill: fb-purple; }
+#datesubtop { fill: fb-light-gray; }
+#datesubbot { fill: fb-purple; }
+
+#weekday { fill: fb-slate; }
+
+/* These are just the texts - the icons are painted in index.view */
+#battery { fill: fb-white; }
+#bpm { fill: fb-white; }
+#hpa { fill: fb-white; }
+#steps { fill: fb-white; }
+#floors { fill: fb-white; }
+

@@ -3,6 +3,7 @@ import document from "document";
 import { me } from "device";
 import { memory } from "system";
 import { HeartRateSensor } from "heart-rate";
+import { Barometer } from "barometer";
 import { today } from "user-activity";
 import { battery } from "power";
 import { BodyPresenceSensor } from "body-presence";
@@ -134,12 +135,12 @@ try {
 
     // Allow pausing for several reasons
     let hrspauser: util.Pauser<reason> = new util.Pauser(
-        () => { hrs?.start(); },
-        () => { hrs?.stop(); bpm = 0; },
+        () => { hrs.start(); },
+        () => { hrs.stop(); bpm = 0; },
     );
 
     // Listen for heart rate
-    hrs.addEventListener('reading', () => { bpm = hrs?.heartRate || 0; });
+    hrs.addEventListener('reading', () => { bpm = hrs.heartRate || 0; });
     hrs.start();
 
     // Pause when not on body
@@ -155,11 +156,47 @@ try {
 } catch (e) { console.error(e); }
 
 
+// -- Barometer -- \\
+
+let hpa = 0;
+
+try {
+    if (!Barometer) throw new Error("no barometer available");
+    const brm: Barometer = new Barometer({ frequency: 1 });
+
+    enum reason {
+        nobody = 1,
+        nodisplay = 2,
+    }
+
+    // Allow pausing for several reasons
+    let brmpauser: util.Pauser<reason> = new util.Pauser(
+        () => { brm.start(); },
+        () => { brm.stop(); bpm = 0; },
+    );
+
+    // Listen for changes
+    brm.addEventListener("reading", () => { hpa = brm.pressure || 0;});
+    brm.start();
+
+    // Pause when not on body
+    if (BodyPresenceSensor) {
+        const bps = new BodyPresenceSensor();
+        bps.addEventListener('reading', () => { brmpauser.apply(reason.nobody, !bps.present); });
+        bps.start();
+    }
+
+    // Pause when not displayed
+    display.addEventListener('change', () => { brmpauser.apply(reason.nodisplay, !display.on); });
+
+} catch (e) { console.error(e); }
+
+
 
 // Allow having different states for the info box
 let state: number = 0;
-const nr_states = 2;
-const sec_p_state = 2;
+const nr_states: number = 1;
+const time_per_state: ms = 2000;
 
 // TODO: use user-chosen locale?
 const months: string[] = [
@@ -170,20 +207,20 @@ const months: string[] = [
     "Jan", "Feb", "Mar", "Apr", "Maj", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dec"
 ];
 
-const days: [string, string][] = [
+const days: [string, string, string][] = [
     // Sun..Sat because ISO-8601 is too hard
 
     // sun, mon,  tues, wednes, thurs,  fri,  satur
     // zon, maan, dins, woens,  donder, vrij, zater
     // sön, mån,  tis,  ons,    tors,   fre,  lör
 
-    ["日・so", "にち"],
-    ["月・ma", "げつ"],
-    ["火・ti", "か"],
-    ["水・wo", "すい"],
-    ["木・to", "もく"],
-    ["金・fr", "きん"],
-    ["土・za", "ど"],
+    ["日", "にち", "so"],
+    ["月", "げつ", "ma"],
+    ["火", "か",   "ti"],
+    ["水", "すい", "wo"],
+    ["木", "もく", "to"],
+    ["金", "きん", "fr"],
+    ["土", "ど",   "za"],
 ];
 
 
@@ -195,25 +232,35 @@ clock.ontick = wraperr(({ date }) => {
     // Set time
     runv((): void => {
         const secs = date.getSeconds();
+        const msecs: ms = secs * 1000;
 
         $('hour').text = date.getHours().toString();
         $('minute').text = util.leftpad(date.getMinutes().toString(), 2, '0');
         $('second').text = util.leftpad(secs.toString(), 2, '0');
 
-        state = Math.floor((secs % (nr_states * sec_p_state)) / sec_p_state);
+        // Update time
+        state = Math.floor((msecs % (nr_states * time_per_state)) / time_per_state);
     });
 
     // Set date
     runv((): void => {
         const day = days[date.getDay()];
-        $('furigana').text = day[1];
-        $('weekday').text = day[0];
+        const kanji = day[0];
+        const furigana = day[1];
+        const weekday = day[2];
+
+        $('weekday').text = kanji;
         $('day').text = util.leftpad(date.getDate().toString(), 2, ' ');
         $('month').text = months[date.getMonth()];
 
-        // Look, I was in a hurry and just wanted the decimal month there
-        $('year').text = (date.getMonth() + 1).toString();
-        $('year').text += " '" + (date.getFullYear() % 100).toString(); // Y2K bug
+        // furigana, weekday, month, year
+        const dst = (
+          (date.getMonth() + 1).toString() + ' '
+          + "'" + (date.getFullYear() % 100).toString()
+        );
+        const dsb = furigana + ' ' + weekday;
+        $('datesubtop').text = dst;
+        $('datesubbot').text = dsb;
     });
 
     // Set battery
@@ -222,14 +269,16 @@ clock.ontick = wraperr(({ date }) => {
 
         $('battery').text = charge.toString();
 
+        // Make it red when it's almost empty
         $style('battery').fill = charge <= 25 ? 'red' : 'white';
     });
 
-    // Set bpm, steps and floors
+    // Set bpm, pressure, steps, and floors
     runv((): void => {
         const steps = today.adjusted.steps;
 
         $('bpm').text = bpm ? bpm.toString() : '--';
+        $('hpa').text = hpa ? Math.floor(hpa - 100000).toString() : '--';
         $('steps').text = steps?.toString() || '--';
         $('floors').text = today.adjusted.elevationGain?.toString() || '--';
 
@@ -242,9 +291,12 @@ clock.ontick = wraperr(({ date }) => {
             $('info_left').text = "Last sync";
             $('info_right').text = util.ago(me.lastSyncTime);
         }
+
+        /*
         else if (state === 1) {
             $('info_left').text = "Memory";
             $('info_right').text = util.b2kb(memory.js.used) + "/" + util.b2kb(memory.js.total) + " KB";
         }
+        */
     });
 });

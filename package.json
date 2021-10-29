@@ -10,7 +10,7 @@
       "access_activity"
     ],
     "buildTargets": [
-      "mira"
+      "vulcan"
     ],
     "i18n": {
       "en": {
@@ -20,9 +20,9 @@
     "defaultLanguage": "en-US"
   },
   "devDependencies": {
-    "@fitbit/sdk": "<5.0.0",
+    "@fitbit/sdk": "^6.0.2",
     "@fitbit/sdk-cli": "^1.7.3",
-    "fitbit-sdk-types": "^6.0.3"
+    "fitbit-sdk-types": "^7.0.4"
   },
   "scripts": {
     "build": "fitbit-build"
