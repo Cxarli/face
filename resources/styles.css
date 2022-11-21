@@ -17,10 +17,16 @@ image {
   y: 0;
 }
 
-#left image {
+#right image {
   /* 48 = 32 + 32/2 */
   x: 100%-48;
 }
+
+#right text {
+  /* 64 = 32 * 2 */
+  width: 100%-64;
+}
+
 
 #left {
   width: 48%;
@@ -136,10 +142,13 @@ image {
 
 .battery {
   height: 25%;
-  width: 100%;
+  width: 80%; /* squircle issues */
 
   x: 5;
   y: 0;
+}
+.battery text {
+  width: 80%-64; /* squircle issues */
 }
 
 .bpm {
@@ -254,7 +263,7 @@ image {
   font-family: 'Colfax-Regular';
 }
 
-#left text {
+#right text {
   font-family: "Colfax-Regular";
   font-size: 36;
 }

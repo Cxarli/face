@@ -26,6 +26,7 @@ const $ = (() => {
     class WrappedElement {
         private _element: Element;
         private _prev_text?: string;
+        private _href?: string;
 
         constructor(element: Element) {
             this._element = element;
@@ -46,6 +47,18 @@ const $ = (() => {
             if (this._prev_text === value) return;
 
             this._prev_text = this._element.text = value;
+        }
+
+        get href(): string {
+            if (typeof this._href !== 'undefined') return this._href;
+
+            return this._href = (<ImageElement> this._element).href;
+        }
+
+        set href(value: string) {
+            if (this._href === value) return;
+
+            this._href = (<ImageElement> this._element).href = value;
         }
     }
 
@@ -195,7 +208,7 @@ try {
 
 // Allow having different states for the info box
 let state: number = 0;
-const nr_states: number = 1;
+const nr_states: number = 2;
 const time_per_state: ms = 2000;
 
 // TODO: use user-chosen locale?
@@ -265,9 +278,13 @@ clock.ontick = wraperr(({ date }) => {
 
     // Set battery
     runv((): void => {
+        const charging = battery.charging;
         const charge = Math.round(battery.chargeLevel);
 
         $('battery').text = charge.toString();
+
+        // Make it filled when it's charging
+        $('battery_image').href = 'assets/icons/stat_am_' + (charging ? 'solid' : 'open') + '_32px.png';
 
         // Make it red when it's almost empty
         $style('battery').fill = charge <= 25 ? 'red' : 'white';
@@ -292,11 +309,9 @@ clock.ontick = wraperr(({ date }) => {
             $('info_right').text = util.ago(me.lastSyncTime);
         }
 
-        /*
-        else if (state === 1) {
-            $('info_left').text = "Memory";
-            $('info_right').text = util.b2kb(memory.js.used) + "/" + util.b2kb(memory.js.total) + " KB";
+        else if (state === 1 && battery.charging && battery.timeUntilFull) {
+            $('info_left').text = "Charge ready";
+            $('info_right').text = util.until(battery.timeUntilFull);
         }
-        */
     });
 });

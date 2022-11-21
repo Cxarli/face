@@ -1,37 +1,5 @@
 <svg class="background" id="bg">
   <svg id="left">
-    <svg class="battery">
-      <text id="battery" class="fillwhite" />
-
-      <image fill="fb-green" href="assets/icons/stat_am_open_32px.png" />
-    </svg>
-
-    <svg class="bpm">
-      <text id="bpm" />
-
-      <image fill="fb-magenta" href="assets/icons/stat_hr_open_32px.png" />
-    </svg>
-
-    <svg class="hpa">
-      <text id="hpa" />
-
-      <image fill="fb-aqua" href="assets/icons/stat_elevation_32px_p.png" />
-    </svg>
-
-    <svg class="steps">
-      <text id="steps" />
-
-      <image fill="fb-blue" href="assets/icons/stat_steps_open_32px.png" />
-    </svg>
-
-    <svg class="floors">
-      <text id="floors" />
-
-      <image fill="fb-yellow" href="assets/icons/stat_floors_open_32px.png" />
-    </svg>
-  </svg>
-
-  <svg id="right">
     <svg class="time">
       <text id="hour" />
       <text id="minute" />
@@ -44,6 +12,38 @@
       <text id="weekday" />
       <text id="datesubtop" />
       <text id="datesubbot" />
+    </svg>
+  </svg>
+
+  <svg id="right">
+    <svg class="battery">
+      <image id="battery_image" fill="fb-green" href="assets/icons/stat_am_open_32px.png" />
+
+      <text id="battery" class="fillwhite" />
+    </svg>
+
+    <svg class="bpm">
+      <image fill="fb-magenta" href="assets/icons/stat_hr_open_32px.png" />
+
+      <text id="bpm" />
+    </svg>
+
+    <svg class="hpa">
+      <image fill="fb-aqua" href="assets/icons/stat_elevation_32px_p.png" />
+
+      <text id="hpa" />
+    </svg>
+
+    <svg class="steps">
+      <image fill="fb-blue" href="assets/icons/stat_steps_open_32px.png" />
+
+      <text id="steps" />
+    </svg>
+
+    <svg class="floors">
+      <image fill="fb-yellow" href="assets/icons/stat_floors_open_32px.png" />
+
+      <text id="floors" />
     </svg>
   </svg>
 
