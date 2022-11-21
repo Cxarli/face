@@ -26,5 +26,15 @@
   },
   "scripts": {
     "build": "fitbit-build"
+  },
+  "dependencies": {
+    "typescript": "^4.9.3",
+    "source-map": "^0.8.0-beta.0"
+  },
+  "resolutions": {
+    "source-map": "^0.8.0-beta.0"
+  },
+  "exports": {
+    "./package.json": "./package.json"
   }
 }
