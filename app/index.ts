@@ -304,14 +304,13 @@ clock.ontick = wraperr(({ date }) => {
 
     // Set info
     runv((): void => {
-        if (state === 0) {
-            $('info_left').text = "Last sync";
-            $('info_right').text = util.ago(me.lastSyncTime);
-        }
-
-        else if (state === 1 && battery.charging && battery.timeUntilFull) {
+        if (state === 1 && battery.charging && battery.timeUntilFull) {
             $('info_left').text = "Charge ready";
             $('info_right').text = util.until(battery.timeUntilFull);
+        }
+        else {
+            $('info_left').text = "Last sync";
+            $('info_right').text = util.ago(me.lastSyncTime);
         }
     });
 });
