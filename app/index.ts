@@ -1,23 +1,20 @@
 import clock from "clock";
 import document from "document";
 import { me } from "device";
-import { memory } from "system";
 import { HeartRateSensor } from "heart-rate";
-import { Barometer } from "barometer";
 import { today } from "user-activity";
-import { battery } from "power";
+import { battery, charger } from "power";
 import { BodyPresenceSensor } from "body-presence";
 import { display } from "display";
 
-import * as util from "../common/utils";
-import { runv, wraperr } from "../common/utils";
+import { leftpad, ago, Pauser } from "../common/utils";
 
 clock.granularity = "seconds";
 
-// milliseconds
-type ms = number;
 
-
+/**
+ * Access the element with the given ID
+ */
 const $ = (() => {
     /**
      * Add a wrapper around the normal Element to cache all .text calls
@@ -134,7 +131,7 @@ const $style = (() => {
 // --- Heart rate --- \\
 
 // Read heart rate
-let bpm = 0;
+let bpm: number | null = null;
 
 try {
     if (!HeartRateSensor) throw new Error("No heart rate sensor detected");
@@ -146,70 +143,27 @@ try {
         nodisplay = 2,
     }
 
-    // Allow pausing for several reasons
-    let hrspauser: util.Pauser<reason> = new util.Pauser(
+    let hrspauser: Pauser<reason> = new Pauser(
         () => { hrs.start(); },
-        () => { hrs.stop(); bpm = 0; },
+        () => { hrs.stop(); bpm = null; },
     );
 
     // Listen for heart rate
-    hrs.addEventListener('reading', () => { bpm = hrs.heartRate || 0; });
+    hrs.addEventListener('reading', () => { bpm = hrs.heartRate; });
     hrs.start();
 
     // Pause when not on body
-    if (BodyPresenceSensor) {
-        const bps = new BodyPresenceSensor();
-        bps.addEventListener('reading', () => { hrspauser.apply(reason.nobody, !bps.present); });
-        bps.start();
-    }
+    if (!BodyPresenceSensor) throw new Error("No body presence sensor detected");
+
+    const bps = new BodyPresenceSensor();
+    bps.addEventListener('reading', () => { hrspauser.apply(reason.nobody, !bps.present); });
+    bps.start();
 
     // Pause when not displayed
     display.addEventListener('change', () => { hrspauser.apply(reason.nodisplay, !display.on); });
 
 } catch (e) { console.error(e); }
 
-
-// -- Barometer -- \\
-
-let hpa = 0;
-
-try {
-    if (!Barometer) throw new Error("no barometer available");
-    const brm: Barometer = new Barometer({ frequency: 1 });
-
-    enum reason {
-        nobody = 1,
-        nodisplay = 2,
-    }
-
-    // Allow pausing for several reasons
-    let brmpauser: util.Pauser<reason> = new util.Pauser(
-        () => { brm.start(); },
-        () => { brm.stop(); bpm = 0; },
-    );
-
-    // Listen for changes
-    brm.addEventListener("reading", () => { hpa = brm.pressure || 0;});
-    brm.start();
-
-    // Pause when not on body
-    if (BodyPresenceSensor) {
-        const bps = new BodyPresenceSensor();
-        bps.addEventListener('reading', () => { brmpauser.apply(reason.nobody, !bps.present); });
-        bps.start();
-    }
-
-    // Pause when not displayed
-    display.addEventListener('change', () => { brmpauser.apply(reason.nodisplay, !display.on); });
-
-} catch (e) { console.error(e); }
-
-
-
-// Allow having different states for the info box
-let state: number = 0;
-const nr_states: number = 2;
-const time_per_state: ms = 2000;
 
 // TODO: use user-chosen locale?
 const months: string[] = [
@@ -220,64 +174,48 @@ const months: string[] = [
     "Jan", "Feb", "Mar", "Apr", "Maj", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dec"
 ];
 
-const days: [string, string, string][] = [
-    // Sun..Sat because ISO-8601 is too hard
+const days: string[] = [
+    // Sun=0 .. Sat=7
 
     // sun, mon,  tues, wednes, thurs,  fri,  satur
     // zon, maan, dins, woens,  donder, vrij, zater
     // sön, mån,  tis,  ons,    tors,   fre,  lör
 
-    ["日", "にち", "so"],
-    ["月", "げつ", "ma"],
-    ["火", "か",   "ti"],
-    ["水", "すい", "wo"],
-    ["木", "もく", "to"],
-    ["金", "きん", "fr"],
-    ["土", "ど",   "za"],
+    "so", "ma", "ti", "wo", "to", "fr", "za",
 ];
 
 
-clock.ontick = wraperr(({ date }) => {
-
-    // I have wrapped several blocks in a `runv` statement to make sure
-    // that everything else can still render if something goes wrong
+clock.ontick = ({ date }) => {
 
     // Set time
-    runv((): void => {
+    try {
         const secs = date.getSeconds();
-        const msecs: ms = secs * 1000;
 
         $('hour').text = date.getHours().toString();
-        $('minute').text = util.leftpad(date.getMinutes().toString(), 2, '0');
-        $('second').text = util.leftpad(secs.toString(), 2, '0');
-
-        // Update time
-        state = Math.floor((msecs % (nr_states * time_per_state)) / time_per_state);
-    });
+        $('minute').text = leftpad(date.getMinutes().toString(), 2, '0');
+        $('second').text = leftpad(secs.toString(), 2, '0');
+    } catch(e) { console.error(e); }
 
     // Set date
-    runv((): void => {
-        const day = days[date.getDay()];
-        const kanji = day[0];
-        const furigana = day[1];
-        const weekday = day[2];
+    try {
+        $('weekday').text = days[date.getDay()];
+        $('day').text = leftpad(date.getDate().toString(), 2, ' ');
+        // getMonth() is 0-based, which is good for indexing
+        $('monthyear').text = months[date.getMonth()] + " " + date.getFullYear().toString();
+    } catch(e) { console.error(e); }
 
-        $('weekday').text = kanji;
-        $('day').text = util.leftpad(date.getDate().toString(), 2, ' ');
-        $('month').text = months[date.getMonth()];
+    // Set active zones minutes today
+    try {
+        const azm = today.adjusted.activeZoneMinutes;
 
-        // furigana, weekday, month, year
-        const dst = (
-          (date.getMonth() + 1).toString() + ' '
-          + "'" + (date.getFullYear() % 100).toString()
-        );
-        const dsb = furigana + ' ' + weekday;
-        $('datesubtop').text = dst;
-        $('datesubbot').text = dsb;
-    });
+        $('active_fat').text = azm?.fatBurn?.toString() || '0',
+        $('active_cardio').text = azm?.cardio?.toString() || '0';
+        $('active_peak').text = azm?.peak?.toString() || '0';
+        $('active_total').text = azm?.total.toString() || '0';
+    } catch(e) { console.error(e); }
 
     // Set battery
-    runv((): void => {
+    try {
         const charging = battery.charging;
         const charge = Math.round(battery.chargeLevel);
 
@@ -287,30 +225,48 @@ clock.ontick = wraperr(({ date }) => {
         $('battery_image').href = 'assets/icons/stat_am_' + (charging ? 'solid' : 'open') + '_32px.png';
 
         // Make it red when it's almost empty
-        $style('battery').fill = charge <= 25 ? 'red' : 'white';
-    });
+        if (charge <= 25) {
+            $style('battery').fill = 'fb-red';
+        } else {
+            $style('battery').fill = 'fb-white';
 
-    // Set bpm, pressure, steps, and floors
-    runv((): void => {
-        const steps = today.adjusted.steps;
+            if (charging) {
+                // solid
+                const goodPower = charger.powerIsGood;
 
-        $('bpm').text = bpm ? bpm.toString() : '--';
-        $('hpa').text = hpa ? Math.floor(hpa - 100000).toString() : '--';
-        $('steps').text = steps?.toString() || '--';
-        $('floors').text = today.adjusted.elevationGain?.toString() || '--';
-
-        $style('steps').fontSize = steps && steps >= 10000 ? 30 : 36;
-    });
-
-    // Set info
-    runv((): void => {
-        if (state === 1 && battery.charging && battery.timeUntilFull) {
-            $('info_left').text = "Charge ready";
-            $('info_right').text = util.until(battery.timeUntilFull);
+                if (goodPower === true) {
+                    $style('battery_image').fill = 'fb-aqua';
+                } else if (goodPower === false) {
+                    $style('battery_image').fill = 'fb-blue';
+                } else {
+                    $style('battery_image').fill = 'fb-green';
+                }
+            } else {
+                // open
+                $style('battery_image').fill = 'fb-green';
+            }
         }
-        else {
-            $('info_left').text = "Last sync";
-            $('info_right').text = util.ago(me.lastSyncTime);
+    } catch(e) { console.error(e); }
+
+    // Set bpm, steps, sync
+    try {
+        $('bpm').text = bpm?.toString() || '--';
+        $('steps_step').text = today.adjusted.steps?.toString() || '--';
+        $('steps_km').text = (today.adjusted.distance ? Math.floor(today.adjusted.distance / 1000).toString() : '--') + ' km';
+        $('sync').text = ago(me.lastSyncTime);
+    } catch(e) { console.error(e); }
+
+    // Easter egg: beating heart on valentine's day
+    try {
+        // NOTE: getMonth() is 0-based
+        if (date.getDay() == 14 && date.getMonth() + 1 == 2) {
+            $("bpm_image").href = "assets/icons/stat_hr_solid_32px.png";
+
+            if (date.getSeconds() % 2 == 0) {
+                $style("bpm_image").fill = "fb-pink";
+            } else {
+                $style("bpm_image").fill = "fb-red";
+            }
         }
-    });
-});
+    } catch(e) { console.error(e); }
+};

@@ -8,10 +8,22 @@
 
     <svg class="date">
       <text id="day" />
-      <text id="month" />
+      <text id="monthyear" />
       <text id="weekday" />
-      <text id="datesubtop" />
-      <text id="datesubbot" />
+    </svg>
+
+    <svg class="active">
+      <image id="active_fat_image" fill="fb-yellow" href="assets/icons/stat_cals_solid_24px.png" />
+      <text id="active_fat" />
+
+      <image id="active_cardio_image" fill="fb-orange" href="assets/icons/stat_cals_solid_24px.png" />
+      <text id="active_cardio" />
+
+      <image id="active_peak_image" fill="fb-red" href="assets/icons/stat_cals_solid_24px.png" />
+      <text id="active_peak" />
+
+      <image id="active_total_image" fill="fb-white" href="assets/icons/stat_cals_solid_24px.png" />
+      <text id="active_total" />
     </svg>
   </svg>
 
@@ -19,40 +31,26 @@
     <svg class="battery">
       <image id="battery_image" fill="fb-green" href="assets/icons/stat_am_open_32px.png" />
 
-      <text id="battery" class="fillwhite" />
+      <text id="battery" />
     </svg>
 
     <svg class="bpm">
-      <image fill="fb-magenta" href="assets/icons/stat_hr_open_32px.png" />
+      <image id="bpm_image" fill="fb-violet" href="assets/icons/stat_hr_open_32px.png" />
 
       <text id="bpm" />
     </svg>
 
-    <svg class="hpa">
-      <image fill="fb-aqua" href="assets/icons/stat_elevation_32px_p.png" />
-
-      <text id="hpa" />
-    </svg>
-
     <svg class="steps">
-      <image fill="fb-blue" href="assets/icons/stat_steps_open_32px.png" />
+      <image fill="fb-peach" href="assets/icons/stat_steps_open_32px.png" />
 
-      <text id="steps" />
+      <text id="steps_step" />
+      <text id="steps_km" />
     </svg>
 
-    <svg class="floors">
-      <image fill="fb-yellow" href="assets/icons/stat_floors_open_32px.png" />
+    <svg class="sync">
+      <image fill="fb-blue" href="assets/icons/btn_combo_reset_p.png" />
 
-      <text id="floors" />
-    </svg>
-  </svg>
-
-  <line x1="0" x2="100%" y1="80%" y2="80%" fill="white" stroke-width="1" />
-
-  <svg id="bottom">
-    <svg id="info">
-      <text id="info_left" />
-      <text id="info_right" />
+      <text id="sync" />
     </svg>
   </svg>
 </svg>

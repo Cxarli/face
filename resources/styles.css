@@ -1,8 +1,21 @@
-/** Positioning **/
+/**
+
+https://dev.fitbit.com/build/guides/user-interface/css/#fitbit-named-colors
+
+*/
+
+
+#right text {
+  font-family: "Colfax-Regular";
+}
+
+#left text {
+  font-family: "Seville-Bold-Condensed";
+}
+
 
 #bg {
-  /* Squircles are the worst to design for, so pretend we're a square */
-
+  /* Squircles are the worst to design for, so zoom in a little to be more like a square */
   width: 96%;
   height: 96%;
 
@@ -11,305 +24,296 @@
 }
 
 image {
+  /* all icons are 32x32 px */
   width: 32;
   height: 32;
-
-  y: 0;
 }
 
 #right image {
-  /* 48 = 32 + 32/2 */
+  /* 48 = 32 (image width) + 32/2 (padding right) */
   x: 100%-48;
 }
 
 #right text {
-  /* 64 = 32 * 2 */
+  /* 64 = 32 (image width) + 32/2 (padding left) + 32/2 (padding right) */
   width: 100%-64;
 }
 
 
 #left {
-  width: 48%;
-  height: 85%; /* 100% - 15% */
+  /* 50% (half screen) - 4% (padding left) - 1% (padding right) */
+  width: 45%;
 
-  x: 2%;
-  y: 0;
+  /* 100% (entire screen) - 10% (padding top) - 5% (padding bottom) */
+  height: 85%;
+
+  /* 4% (padding left) */
+  x: 4%;
+
+  /* 5% (padding top) */
+  y: 10%;
 }
 
 #right {
+  /* 50% (half screen) - 1% (padding left) - 1% (padding right) */
   width: 48%;
-  height: 85%; /* 100% - 15% */
 
-  x: 52%;
-  y: 0;
+  /* 100% (entire screen) - 5% (padding top) - 5% (padding bottom) */
+  height: 90%;
+
+  /* 50% (half screen) + 1% (padding left) */
+  x: 51%;
+
+  /* 5% (padding top) */
+  y: 5%;
 }
 
-#bottom {
-  width: 100%;
-  height: 15%;
-
-  x: 0;
-  y: 90%; /* 100% - 15% + (line = 5%) */
-}
-
+/* Time */
 
 .time {
-  height: 50%;
-  width: 95%;
+  height: 30%;
+  width: 100%;
 
   x: 0;
   y: 0;
 }
 
-.date {
-  height: 50%;
-  width: 95%;
-
-  x: 0;
-  y: 50%;
-}
-
-
 #hour {
-  x: 50%;
+  x: 30%;
   y: 50%;
 
-  text-length: 3;
+  text-length: 2;
   text-anchor: end;
+  font-size: 50;
+  fill: fb-pink;
 }
 
 #minute {
-  x: 100%;
+  x: 72%;
   y: 50%;
 
-  text-length: 3;
+  text-length: 2;
   text-anchor: end;
+  font-size: 50;
+  fill: fb-orange;
 }
 
 #second {
   x: 100%;
-  y: 75%;
+  y: 50%;
 
   text-length: 2;
   text-anchor: end;
+  font-size: 30;
+  fill: fb-pink;
+}
+
+/* Date */
+
+.date {
+  height: 30%;
+  width: 100%;
+
+  x: 0;
+  y: 30%;
+}
+
+#weekday {
+  x: 30%;
+  y: 40%;
+
+  /* dd */
+  text-length: 2;
+  text-anchor: end;
+  font-size: 50;
+  fill: fb-pink; 
 }
 
 #day {
-  x: 50%;
-  y: 25%;
+  x: 72%;
+  y: 40%;
 
   /* DD */
   text-length: 2;
   text-anchor: end;
+  font-size: 50;
+  fill: fb-orange;
 }
 
-#month {
+#monthyear {
   x: 100%;
+  y: 70%;
+
+  /* MMM YYYY */
+  text-length: 8;
+  text-anchor: end;
+  font-size: 20;
+  fill: fb-pink;
+}
+
+/* Active */
+
+.active {
+  height: 40%;
+  width: 100%;
+
+  x: 0;
+  y: 60%;
+}
+
+.active image {
+  width: 24;
+  height: 24;
+}
+
+
+#active_fat {
+  x: 20%;
   y: 25%;
 
-  /* MMM */
   text-length: 3;
-  text-anchor: end;
+  text-anchor: start;
+  font-size: 24;
+  fill: fb-white;
+}
+#active_fat_image {
+  x: 0%;
+  y: 0%;
 }
 
-#datesub { fill: fb-light-gray; }
-#weekday {
+#active_cardio {
+  x: 70%;
+  y: 25%;
+
+  text-length: 3;
+  text-anchor: start;
+  font-size: 24;
+  fill: fb-white;
+}
+#active_cardio_image {
   x: 50%;
+  y: 0%;
+}
+
+#active_peak {
+  x: 20%;
   y: 75%;
 
-  /* K** */
   text-length: 3;
-  text-anchor: end;
+  text-anchor: start;
+  font-size: 24;
+  fill: fb-white;
 }
-
-#datesubtop {
-  x: 100%;
+#active_peak_image {
+  x: 0%;
   y: 50%;
-
-  /* MM 'YY */
-  text-length: 6;
-  text-anchor: end;
 }
-#datesubbot {
-  x: 100%;
+
+#active_total {
+  x: 70%;
   y: 75%;
 
-  /* F**U** WD */
-  text-length: 9;
-  text-anchor: end;
+  text-length: 3;
+  text-anchor: start;
+  font-size: 24;
+  fill: fb-white;
+}
+#active_total_image {
+  x: 50%;
+  y: 50%;
 }
 
+
+/* Battery */
 
 .battery {
   height: 25%;
-  width: 80%; /* squircle issues */
+  width: 100%;
 
   x: 5;
   y: 0;
 }
 .battery text {
-  width: 80%-64; /* squircle issues */
+  width: 100%-64;
 }
+#battery {
+  x: 100%-64;
+  y: 30;
+
+  /* ### */
+  text-length: 3;
+  text-anchor: end;
+  fill: fb-white;
+  font-size: 36;
+}
+
+/* BPM */
 
 .bpm {
   height: 25%;
   width: 100%;
 
   x: 5;
-  y: 20%;
+  y: 25%;
+}
+#bpm {
+  x: 100%-64;
+  y: 30;
+
+  /* ### */
+  text-length: 3;
+  text-anchor: end;
+  fill: fb-white;
+  font-size: 36;
 }
 
-.hpa {
-  height: 25%;
-  width: 100%;
-
-  x: 5;
-  y: 40%;
-}
+/* Steps */
 
 .steps {
   height: 25%;
   width: 100%;
 
   x: 5;
+  y: 50%;
+}
+#steps_step {
+  x: 100%-64;
+  y: 20%;
+
+  /* ###### */
+  text-length: 6;
+  text-anchor: end;
+  fill: fb-white;
+  font-size: 30;
+}
+#steps_km {
+  x: 100%-64;
   y: 60%;
+
+  /* ### km */
+  text-length: 6;
+  text-anchor: end;
+  fill: fb-white;
+  font-size: 30;
 }
 
-.floors {
+
+/* Sync */
+
+.sync {
   height: 25%;
   width: 100%;
 
   x: 5;
-  y: 80%;
+  y: 75%;
 }
-
-
-#battery {
+#sync {
   x: 100%-64;
   y: 30;
 
+  /* ##[smhd] */
   text-length: 3;
   text-anchor: end;
-}
-
-#bpm {
-  x: 100%-64;
-  y: 30;
-
-  text-length: 3;
-  text-anchor: end;
-}
-
-#hpa {
-  x: 100%-64;
-  y: 30;
-
-  text-length: 10;
-  text-anchor: end;
-}
-
-#steps {
-  x: 100%-64;
-  y: 30;
-
-  text-length: 6;
-  text-anchor: end;
-}
-
-#floors {
-  x: 100%-64;
-  y: 30;
-
-  text-length: 3;
-  text-anchor: end;
-}
-
-
-
-#info {
-  font-size: 25;
-
-  height: 100%;
-  width: 100%;
-  x: 0;
-  y: 0;
-}
-
-#info_left {
-  width: 50%;
-  height: 100%;
-  x: 25%;
-  y: 0;
-
-  text-length: 25;
-  text-anchor: middle;
-}
-
-#info_right {
-  width: 50%;
-  height: 100%;
-  x: 75%;
-  y: 0;
-
-  text-length: 25;
-  text-anchor: middle;
-}
-
-
-/** Fonts **/
-
-#weekday {
-  font-size: 50;
-  font-family: 'Colfax-Regular';
-}
-
-#right text {
-  font-family: "Colfax-Regular";
+  fill: fb-white;
   font-size: 36;
 }
-
-.time text {
-  font-family: "Seville-Bold-Condensed";
-  font-size: 65;
-}
-
-.date text {
-  font-family: "Seville-Bold-Condensed";
-  font-size: 45;
-}
-
-#second {
-  font-size: 25;
-}
-
-#datesubtop {
-  font-size: 20;
-}
-#datesubbot {
-  font-size: 20;
-}
-
-
-/** Colors **/
-
-#info_left { fill: fb-light-gray; }
-#info_right { fill: fb-white; }
-
-#hour { fill: fb-slate; }
-#minute { fill: fb-purple; }
-#second { fill: fb-light-gray; }
-
-#day { fill: fb-slate; }
-#month { fill: fb-purple; }
-#datesubtop { fill: fb-light-gray; }
-#datesubbot { fill: fb-purple; }
-
-#weekday { fill: fb-slate; }
-
-/* These are just the texts - the icons are painted in index.view */
-#battery { fill: fb-white; }
-#bpm { fill: fb-white; }
-#hpa { fill: fb-white; }
-#steps { fill: fb-white; }
-#floors { fill: fb-white; }
-
