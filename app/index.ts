@@ -1,6 +1,6 @@
 import clock from "clock";
 import document from "document";
-import { me } from "device";
+import { me as device } from "device";
 import { HeartRateSensor } from "heart-rate";
 import { today } from "user-activity";
 import { battery, charger } from "power";
@@ -16,13 +16,16 @@ clock.granularity = "seconds";
  * Access the element with the given ID
  */
 const $ = (() => {
+    class Unset {}
+    const UNSET = new Unset();
+
     /**
      * Add a wrapper around the normal Element to cache all .text calls
      * to make sure that nothing on the DOM happens if the value didn't change
      */
     class WrappedElement {
         private _element: Element;
-        private _prev_text?: string;
+        private _prev_text: string | number | null | undefined | Unset = UNSET;
         private _href?: string;
 
         constructor(element: Element) {
@@ -33,17 +36,28 @@ const $ = (() => {
             return this._element;
         }
 
-        get text(): string {
-            if (typeof this._prev_text !== 'undefined') return this._prev_text;
+        get text(): string | number | null | undefined {
+            // not set yet, get from actual element
+            if (this._prev_text instanceof Unset) return this._prev_text = this._element.text;
 
-            return this._prev_text = this._element.text;
+            return this._prev_text;
         }
 
-        set text(value: string) {
+        set text(value: string | number | null | undefined) {
             // Don't change if nothing changed
             if (this._prev_text === value) return;
 
-            this._prev_text = this._element.text = value;
+            this._prev_text = value;
+
+            if (typeof value === 'string') {
+                this._element.text = value;
+            } else if (typeof value === 'number') {
+                this._element.text = value.toString();
+            } else if (value === null || typeof value === 'undefined') {
+                this._element.text = '??';
+            } else {
+                throw Error("value is not string, number, null or undefined");
+            }
         }
 
         get href(): string {
@@ -189,11 +203,9 @@ clock.ontick = ({ date }) => {
 
     // Set time
     try {
-        const secs = date.getSeconds();
-
-        $('hour').text = date.getHours().toString();
+        $('hour').text = date.getHours();
         $('minute').text = leftpad(date.getMinutes().toString(), 2, '0');
-        $('second').text = leftpad(secs.toString(), 2, '0');
+        $('second').text = leftpad(date.getSeconds().toString(), 2, '0');
     } catch(e) { console.error(e); }
 
     // Set date
@@ -206,31 +218,35 @@ clock.ontick = ({ date }) => {
 
     // Set active zones minutes today
     try {
-        const azm = today.adjusted.activeZoneMinutes;
+        // .adjusted is not available for heart rate zones
+        const azm = today.local.activeZoneMinutes;
 
-        $('active_fat').text = azm?.fatBurn?.toString() || '0',
-        $('active_cardio').text = azm?.cardio?.toString() || '0';
-        $('active_peak').text = azm?.peak?.toString() || '0';
-        $('active_total').text = azm?.total.toString() || '0';
+        $('active_fat').text = azm?.fatBurn;
+
+        // FitBit argues that any minute spent in higher zones counts for 2 minute,
+        // I argue that's marketing bullshit and we should show the values as they really are
+        $('active_cardio').text = azm?.cardio !== undefined ? (azm.cardio / 2) : undefined;
+        $('active_peak').text = azm?.peak !== undefined ? (azm?.peak / 2) : undefined;
+
+        // total is fat + 2*cardio + 2*peak so we need to recalculate this ourselves too for the real values
+        $('active_total').text = (azm?.fatBurn || 0) + (azm?.cardio || 0) / 2 + (azm?.peak || 0) / 2;
+
     } catch(e) { console.error(e); }
 
     // Set battery
     try {
-        const charging = battery.charging;
-        const charge = Math.round(battery.chargeLevel);
-
-        $('battery').text = charge.toString();
+        $('battery').text = battery.chargeLevel;
 
         // Make it filled when it's charging
-        $('battery_image').href = 'assets/icons/stat_am_' + (charging ? 'solid' : 'open') + '_32px.png';
+        $('battery_image').href = 'assets/icons/stat_am_' + (battery.charging ? 'solid' : 'open') + '_32px.png';
 
         // Make it red when it's almost empty
-        if (charge <= 25) {
+        if (battery.chargeLevel <= 25) {
             $style('battery').fill = 'fb-red';
         } else {
             $style('battery').fill = 'fb-white';
 
-            if (charging) {
+            if (battery.charging) {
                 // solid
                 const goodPower = charger.powerIsGood;
 
@@ -250,10 +266,13 @@ clock.ontick = ({ date }) => {
 
     // Set bpm, steps, sync
     try {
-        $('bpm').text = bpm?.toString() || '--';
-        $('steps_step').text = today.adjusted.steps?.toString() || '--';
-        $('steps_km').text = (today.adjusted.distance ? Math.floor(today.adjusted.distance / 1000).toString() : '--') + ' km';
-        $('sync').text = ago(me.lastSyncTime);
+        $('bpm').text = bpm;
+
+        const adj = today.adjusted;
+        $('steps_step').text = adj.steps;
+        $('steps_km').text = (today.adjusted.distance !== undefined ? Math.floor(today.adjusted.distance / 1000).toString() : '??') + ' km';
+
+        $('sync').text = ago(device.lastSyncTime);
     } catch(e) { console.error(e); }
 
     // Easter egg: beating heart on valentine's day
